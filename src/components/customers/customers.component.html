@@ -1,0 +1,59 @@
+<div class="customers-container">
+  <div class="header">
+    <div class="header-content">
+      <button class="back-btn" (click)="goBack()">← Back</button>
+      <h1>All Customers</h1>
+      <button class="add-btn" (click)="addCustomer()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+        placeholder="Search by name, phone, email, or IMEI..."
+        class="search-input"
+      />
+      <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''; onSearch()">✕</button>
+    </div>
+  </div>
+
+  <div class="customers-list">
+    <div class="list-header">
+      <span class="count">{{ filteredCustomers.length }} customer(s)</span>
+    </div>
+
+    <div
+      *ngFor="let customer of filteredCustomers"
+      class="customer-item"
+      (click)="viewCustomerDetails(customer.id)"
+    >
+      <div class="customer-avatar">{{ customer.name.charAt(0) }}</div>
+      <div class="customer-details">
+        <div class="customer-name">{{ customer.name }}</div>
+        <div class="customer-contact">
+          <span class="phone">📞 {{ customer.phoneNumber }}</span>
+        </div>
+        <div class="customer-info-row">
+          <span class="city">📍 {{ customer.city }}</span>
+          <span class="phones">📱 {{ customer.phones.length }} phone(s)</span>
+        </div>
+        <div class="customer-footer">
+          <span class="payment-method">{{ customer.paymentMethod }}</span>
+          <span class="amount">{{ formatCurrency(customer.totalPurchaseAmount) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="filteredCustomers.length === 0" class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>No customers found</h3>
+      <p *ngIf="searchQuery">Try adjusting your search query</p>
+      <p *ngIf="!searchQuery">Add your first customer to get started</p>
+      <button class="empty-action-btn" (click)="addCustomer()">Add Customer</button>
+    </div>
+  </div>
+</div>
