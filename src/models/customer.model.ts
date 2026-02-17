@@ -22,4 +22,7 @@ export interface Customer {
   registrationDate: Date;
   lastVisit: Date;
   notes?: string;
+  adharNumber?: string;
+  adharPhotoFront?: string; // Base64 encoded image
+  adharPhotoBack?: string; // Base64 encoded image
 }

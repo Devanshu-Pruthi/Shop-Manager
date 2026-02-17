@@ -18,7 +18,7 @@ export class CustomerDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private customerService: CustomerService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

@@ -13,97 +13,116 @@
 
       <div class="form-group">
         <label for="name">Full Name *</label>
-        <input
-          type="text"
-          id="name"
-          [(ngModel)]="customer.name"
-          name="name"
-          placeholder="Enter customer name"
-          required
-        />
+        <input type="text" id="name" [(ngModel)]="customer.name" name="name" placeholder="Enter customer name"
+          required />
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="phoneNumber">Phone Number *</label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            [(ngModel)]="customer.phoneNumber"
-            name="phoneNumber"
-            placeholder="+91 XXXXX XXXXX"
-            required
-          />
+          <input type="tel" id="phoneNumber" [(ngModel)]="customer.phoneNumber" name="phoneNumber"
+            placeholder="+91 XXXXX XXXXX" required />
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            [(ngModel)]="customer.email"
-            name="email"
-            placeholder="email@example.com"
-          />
+          <input type="email" id="email" [(ngModel)]="customer.email" name="email" placeholder="email@example.com" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="adharNumber">Adhar Number *</label>
+          <input type="text" id="adharNumber" [(ngModel)]="customer.adharNumber" name="adharNumber"
+            placeholder="12 digit Adhar Number" required maxlength="14" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Front Side -->
+        <div class="form-group">
+          <label>Adhar Front Side</label>
+          <div class="photo-actions">
+            <input type="file" #frontFile (change)="onFileSelected($event, 'front')" accept="image/*"
+              style="display: none" />
+            <button type="button" class="action-btn upload-btn" (click)="frontFile.click()">
+              Upload Photo
+            </button>
+            <button type="button" class="action-btn camera-btn" (click)="startCamera('front')">
+              Capture
+            </button>
+          </div>
+          <div *ngIf="selectedFrontFileName" class="file-name">
+            {{ selectedFrontFileName }}
+          </div>
+          <div *ngIf="customer.adharPhotoFront" class="preview-container">
+            <img [src]="customer.adharPhotoFront" class="preview-img" />
+          </div>
+        </div>
+
+        <!-- Back Side -->
+        <div class="form-group">
+          <label>Adhar Back Side</label>
+          <div class="photo-actions">
+            <input type="file" #backFile (change)="onFileSelected($event, 'back')" accept="image/*"
+              style="display: none" />
+            <button type="button" class="action-btn upload-btn" (click)="backFile.click()">
+              Upload Photo
+            </button>
+            <button type="button" class="action-btn camera-btn" (click)="startCamera('back')">
+              Capture
+            </button>
+          </div>
+          <div *ngIf="selectedBackFileName" class="file-name">
+            {{ selectedBackFileName }}
+          </div>
+          <div *ngIf="customer.adharPhotoBack" class="preview-container">
+            <img [src]="customer.adharPhotoBack" class="preview-img" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Camera Modal Overlay -->
+      <div class="camera-overlay" *ngIf="showCamera">
+        <div class="camera-modal">
+          <h3>Capture {{ currentSide === 'front' ? 'Front' : 'Back' }} Side</h3>
+          <div class="video-container">
+            <video autoplay playsinline></video>
+          </div>
+          <div class="camera-controls">
+            <button type="button" class="capture-btn" (click)="captureImage()">Capture</button>
+            <button type="button" class="cancel-btn" (click)="stopCamera()">Cancel</button>
+          </div>
         </div>
       </div>
 
       <div class="form-group">
         <label for="address">Address</label>
-        <input
-          type="text"
-          id="address"
-          [(ngModel)]="customer.address"
-          name="address"
-          placeholder="Street address"
-        />
+        <input type="text" id="address" [(ngModel)]="customer.address" name="address" placeholder="Street address" />
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="city">City *</label>
-          <input
-            type="text"
-            id="city"
-            [(ngModel)]="customer.city"
-            name="city"
-            placeholder="City"
-            required
-          />
+          <input type="text" id="city" [(ngModel)]="customer.city" name="city" placeholder="City" required />
         </div>
 
         <div class="form-group">
           <label for="state">State</label>
-          <input
-            type="text"
-            id="state"
-            [(ngModel)]="customer.state"
-            name="state"
-            placeholder="State"
-          />
+          <input type="text" id="state" [(ngModel)]="customer.state" name="state" placeholder="State" />
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="referredBy">Referred By</label>
-          <input
-            type="text"
-            id="referredBy"
-            [(ngModel)]="customer.referredBy"
-            name="referredBy"
-            placeholder="Walk-in, Friend, Ad, etc."
-          />
+          <input type="text" id="referredBy" [(ngModel)]="customer.referredBy" name="referredBy"
+            placeholder="Walk-in, Friend, Ad, etc." />
         </div>
 
         <div class="form-group">
           <label for="paymentMethod">Payment Method *</label>
-          <select
-            id="paymentMethod"
-            [(ngModel)]="customer.paymentMethod"
-            name="paymentMethod"
-            required
-          >
+          <select id="paymentMethod" [(ngModel)]="customer.paymentMethod" name="paymentMethod" required>
             <option value="Cash">Cash</option>
             <option value="Card">Card</option>
             <option value="UPI">UPI</option>
@@ -122,12 +141,7 @@
       <div *ngFor="let phone of phones; let i = index" class="phone-entry">
         <div class="phone-header">
           <h3>Phone {{ i + 1 }}</h3>
-          <button
-            *ngIf="phones.length > 1"
-            type="button"
-            class="remove-btn"
-            (click)="removePhone(i)"
-          >
+          <button *ngIf="phones.length > 1" type="button" class="remove-btn" (click)="removePhone(i)">
             Remove
           </button>
         </div>
@@ -135,52 +149,27 @@
         <div class="form-row">
           <div class="form-group">
             <label [for]="'brand-' + i">Brand *</label>
-            <input
-              type="text"
-              [id]="'brand-' + i"
-              [(ngModel)]="phone.brand"
-              [name]="'brand-' + i"
-              placeholder="Samsung, Apple, etc."
-              required
-            />
+            <input type="text" [id]="'brand-' + i" [(ngModel)]="phone.brand" [name]="'brand-' + i"
+              placeholder="Samsung, Apple, etc." required />
           </div>
 
           <div class="form-group">
             <label [for]="'model-' + i">Model *</label>
-            <input
-              type="text"
-              [id]="'model-' + i"
-              [(ngModel)]="phone.model"
-              [name]="'model-' + i"
-              placeholder="Galaxy S23, iPhone 15"
-              required
-            />
+            <input type="text" [id]="'model-' + i" [(ngModel)]="phone.model" [name]="'model-' + i"
+              placeholder="Galaxy S23, iPhone 15" required />
           </div>
         </div>
 
         <div class="form-group">
           <label [for]="'imei-' + i">IMEI Number *</label>
-          <input
-            type="text"
-            [id]="'imei-' + i"
-            [(ngModel)]="phone.imeiNumber"
-            [name]="'imei-' + i"
-            placeholder="15 digit IMEI number"
-            required
-          />
+          <input type="text" [id]="'imei-' + i" [(ngModel)]="phone.imeiNumber" [name]="'imei-' + i"
+            placeholder="15 digit IMEI number" required />
         </div>
 
         <div class="form-group">
           <label [for]="'price-' + i">Price (₹) *</label>
-          <input
-            type="number"
-            [id]="'price-' + i"
-            [(ngModel)]="phone.price"
-            [name]="'price-' + i"
-            placeholder="0"
-            min="0"
-            required
-          />
+          <input type="number" [id]="'price-' + i" [(ngModel)]="phone.price" [name]="'price-' + i" placeholder="0"
+            min="0" required />
         </div>
       </div>
     </div>
@@ -188,13 +177,8 @@
     <div class="form-section">
       <div class="form-group">
         <label for="notes">Notes</label>
-        <textarea
-          id="notes"
-          [(ngModel)]="customer.notes"
-          name="notes"
-          rows="3"
-          placeholder="Additional notes about the customer..."
-        ></textarea>
+        <textarea id="notes" [(ngModel)]="customer.notes" name="notes" rows="3"
+          placeholder="Additional notes about the customer..."></textarea>
       </div>
     </div>
 

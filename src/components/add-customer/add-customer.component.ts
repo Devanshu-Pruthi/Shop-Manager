@@ -22,7 +22,11 @@ export class AddCustomerComponent {
     state: '',
     referredBy: '',
     paymentMethod: 'Cash' as 'Cash' | 'Card' | 'UPI' | 'EMI',
-    notes: ''
+
+    notes: '',
+    adharNumber: '',
+    adharPhotoFront: '',
+    adharPhotoBack: ''
   };
 
   phones: Array<{
@@ -37,12 +41,93 @@ export class AddCustomerComponent {
     price: 0
   }];
 
+
+
   errorMessage = '';
+  selectedFrontFileName = '';
+  selectedBackFileName = '';
+  showCamera = false;
+  currentSide: 'front' | 'back' = 'front';
+  videoStream: MediaStream | null = null;
+
+  onFileSelected(event: any, side: 'front' | 'back'): void {
+    const file = event.target.files[0];
+    if (file) {
+      if (side === 'front') {
+        this.selectedFrontFileName = file.name;
+      } else {
+        this.selectedBackFileName = file.name;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        if (side === 'front') {
+          this.customer.adharPhotoFront = e.target.result;
+        } else {
+          this.customer.adharPhotoBack = e.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   constructor(
     private customerService: CustomerService,
     private router: Router
-  ) {}
+  ) { }
+
+  startCamera(side: 'front' | 'back'): void {
+    this.currentSide = side;
+    this.showCamera = true;
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        this.videoStream = stream;
+        // Use a timeout to ensure the video element exists after the View updates
+        setTimeout(() => {
+          const videoElement = document.querySelector('video');
+          if (videoElement) {
+            videoElement.srcObject = stream;
+          }
+        }, 100);
+      })
+      .catch(err => {
+        console.error("Error accessing camera: ", err);
+        this.errorMessage = "Could not access camera. Please check permissions.";
+        this.showCamera = false;
+      });
+  }
+
+  captureImage(): void {
+    const videoElement = document.querySelector('video');
+    const canvas = document.createElement('canvas');
+    if (videoElement) {
+      canvas.width = videoElement.videoWidth;
+      canvas.height = videoElement.videoHeight;
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        const imageData = canvas.toDataURL('image/png');
+
+        if (this.currentSide === 'front') {
+          this.customer.adharPhotoFront = imageData;
+          this.selectedFrontFileName = 'Captured from Camera';
+        } else {
+          this.customer.adharPhotoBack = imageData;
+          this.selectedBackFileName = 'Captured from Camera';
+        }
+
+        this.stopCamera();
+      }
+    }
+  }
+
+  stopCamera(): void {
+    if (this.videoStream) {
+      this.videoStream.getTracks().forEach(track => track.stop());
+      this.videoStream = null;
+    }
+    this.showCamera = false;
+  }
 
   addPhone(): void {
     this.phones.push({
@@ -89,7 +174,10 @@ export class AddCustomerComponent {
       paymentMethod: this.customer.paymentMethod,
       registrationDate: new Date(),
       lastVisit: new Date(),
-      notes: this.customer.notes
+      notes: this.customer.notes,
+      adharNumber: this.customer.adharNumber,
+      adharPhotoFront: this.customer.adharPhotoFront,
+      adharPhotoBack: this.customer.adharPhotoBack
     };
 
     this.customerService.addCustomer(newCustomer);
@@ -104,6 +192,11 @@ export class AddCustomerComponent {
 
     if (!this.customer.phoneNumber.trim()) {
       this.errorMessage = 'Please enter phone number';
+      return false;
+    }
+
+    if (!this.customer.adharNumber.trim()) {
+      this.errorMessage = 'Please enter Adhar Number';
       return false;
     }
 

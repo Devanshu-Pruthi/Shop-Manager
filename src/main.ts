@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, RouterOutlet } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -14,10 +15,11 @@ import { authGuard } from './guards/auth.guard';
   imports: [RouterOutlet],
   template: `<router-outlet></router-outlet>`
 })
-export class App {}
+export class App { }
 
 bootstrapApplication(App, {
   providers: [
+    provideHttpClient(),
     provideRouter([
       { path: '', redirectTo: '/login', pathMatch: 'full' },
       { path: 'login', component: LoginComponent },
