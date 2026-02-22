@@ -4,6 +4,8 @@
       <button class="back-btn" (click)="goBack()">← Back</button>
       <h1>Customer Details</h1>
       <div class="spacer"></div>
+      <button class="edit-btn" (click)="navigateToEdit()">✏️ Edit</button>
+      <button *ngIf="isAdmin" class="delete-btn" (click)="deleteCustomer()">🗑️ Delete</button>
     </div>
   </div>
 
@@ -48,63 +50,91 @@
           <span class="label">Registration Date:</span>
           <span class="value">{{ formatDate(customer.registrationDate) }}</span>
         </div>
-        <div class="info-row">
-          <span class="label">Last Visit:</span>
-          <span class="value">{{ formatDate(customer.lastVisit) }}</span>
+        <div class="info-row" *ngIf="customer.adharNumber">
+          <span class="label">Adhar Number:</span>
+          <span class="value">{{ customer.adharNumber }}</span>
+        </div>
+        <div class="info-row" *ngIf="customer.createdBy">
+          <span class="label">Added By:</span>
+          <span class="value" style="color: #3182ce; font-weight: 700;">{{ customer.createdBy.name }} ({{
+            customer.createdBy.role }})</span>
         </div>
       </div>
     </div>
 
-    <div class="info-section">
-      <h3>Purchase Summary</h3>
-      <div class="summary-cards">
-        <div class="summary-card">
-          <div class="summary-label">Total Phones</div>
-          <div class="summary-value">{{ customer.phones.length }}</div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-label">Payment Method</div>
-          <div class="summary-value payment-badge">{{ customer.paymentMethod }}</div>
-        </div>
-        <div class="summary-card total">
-          <div class="summary-label">Total Amount</div>
-          <div class="summary-value amount">{{ formatCurrency(customer.totalPurchaseAmount) }}</div>
+  </div>
+
+
+  <div class="info-section">
+    <h3>Adhar Card Photos</h3>
+    <div class="adhar-photos-row">
+      <div class="adhar-photo-item" *ngIf="customer.adharPhotoFront">
+        <h4>Front Side</h4>
+        <div class="adhar-photo-container">
+          <img [src]="customer.adharPhotoFront" alt="Adhar Front" class="adhar-image" />
         </div>
       </div>
+      <div class="adhar-photo-item" *ngIf="customer.adharPhotoBack">
+        <h4>Back Side</h4>
+        <div class="adhar-photo-container">
+          <img [src]="customer.adharPhotoBack" alt="Adhar Back" class="adhar-image" />
+        </div>
+      </div>
+      <div *ngIf="!customer.adharPhotoFront && !customer.adharPhotoBack" class="no-photos">
+        No Adhar photos available
+      </div>
     </div>
+  </div>
 
-    <div class="info-section">
-      <h3>Phones Purchased ({{ customer.phones.length }})</h3>
-      <div class="phones-list">
-        <div *ngFor="let phone of customer.phones; let i = index" class="phone-card">
-          <div class="phone-number">Phone {{ i + 1 }}</div>
-          <div class="phone-details">
-            <div class="phone-main">
-              <div class="phone-brand-model">
-                {{ phone.brand }} {{ phone.model }}
-              </div>
-              <div class="phone-price">{{ formatCurrency(phone.price) }}</div>
+  <div class="info-section">
+    <h3>Purchase Summary</h3>
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-label">Total Phones</div>
+        <div class="summary-value">{{ customer.phones.length }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Payment Method</div>
+        <div class="summary-value payment-badge">{{ customer.paymentMethod }}</div>
+      </div>
+      <div class="summary-card total">
+        <div class="summary-label">Total Amount</div>
+        <div class="summary-value amount">{{ formatCurrency(customer.totalPurchaseAmount) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h3>Phones Purchased ({{ customer.phones.length }})</h3>
+    <div class="phones-list">
+      <div *ngFor="let phone of customer.phones; let i = index" class="phone-card">
+        <div class="phone-number">Phone {{ i + 1 }}</div>
+        <div class="phone-details">
+          <div class="phone-main">
+            <div class="phone-brand-model">
+              {{ phone.brand }} {{ phone.model }}
             </div>
-            <div class="phone-meta">
-              <div class="meta-row">
-                <span class="meta-label">IMEI:</span>
-                <span class="meta-value imei">{{ phone.imeiNumber }}</span>
-              </div>
-              <div class="meta-row">
-                <span class="meta-label">Purchase Date:</span>
-                <span class="meta-value">{{ formatDate(phone.purchaseDate) }}</span>
-              </div>
+            <div class="phone-price">{{ formatCurrency(phone.price) }}</div>
+          </div>
+          <div class="phone-meta">
+            <div class="meta-row">
+              <span class="meta-label">IMEI:</span>
+              <span class="meta-value imei">{{ phone.imeiNumber }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Purchase Date:</span>
+              <span class="meta-value">{{ formatDate(phone.purchaseDate) }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="info-section" *ngIf="customer.notes">
-      <h3>Notes</h3>
-      <div class="notes-content">
-        {{ customer.notes }}
-      </div>
+  <div class="info-section" *ngIf="customer.notes">
+    <h3>Notes</h3>
+    <div class="notes-content">
+      {{ customer.notes }}
     </div>
   </div>
 </div>

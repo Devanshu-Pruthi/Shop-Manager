@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -18,8 +19,9 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
+    private toastService: ToastService,
     private router: Router
-  ) {}
+  ) { }
 
   onSubmit(): void {
     if (!this.username || !this.password) {
@@ -27,11 +29,14 @@ export class LoginComponent {
       return;
     }
 
-    const success = this.authService.login(this.username, this.password);
-    if (success) {
-      this.router.navigate(['/dashboard']);
-    } else {
-      this.errorMessage = 'Invalid credentials';
-    }
+    this.authService.login(this.username, this.password).subscribe({
+      next: (res) => {
+        this.toastService.success(`Welcome back, ${res.name}!`);
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => {
+        this.toastService.error('Invalid credentials');
+      }
+    });
   }
 }

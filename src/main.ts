@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter, RouterOutlet } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -7,23 +8,39 @@ import { CustomersComponent } from './components/customers/customers.component';
 import { AddCustomerComponent } from './components/add-customer/add-customer.component';
 import { CustomerDetailsComponent } from './components/customer-details/customer-details.component';
 import { authGuard } from './guards/auth.guard';
+import { customerResolver } from './resolvers/customer.resolver';
+import { LoaderComponent } from './components/loader/loader.component';
+import { loadingInterceptor } from './interceptors/loading.interceptor';
+import { ManageStaffComponent } from './components/manage-staff/manage-staff.component';
+import { adminGuard } from './guards/admin.guard';
+
+import { ToastComponent } from './components/toast/toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  template: `<router-outlet></router-outlet>`
+  imports: [RouterOutlet, LoaderComponent, ToastComponent],
+  template: `
+    <app-loader></app-loader>
+    <app-toast></app-toast>
+    <router-outlet></router-outlet>
+  `
 })
-export class App {}
+export class App { }
 
 bootstrapApplication(App, {
   providers: [
+    provideHttpClient(
+      withInterceptors([loadingInterceptor])
+    ),
     provideRouter([
       { path: '', redirectTo: '/login', pathMatch: 'full' },
       { path: 'login', component: LoginComponent },
-      { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-      { path: 'customers', component: CustomersComponent, canActivate: [authGuard] },
+      { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard], resolve: { customers: customerResolver } },
+      { path: 'manage-staff', component: ManageStaffComponent, canActivate: [authGuard, adminGuard] },
+      { path: 'customers', component: CustomersComponent, canActivate: [authGuard], resolve: { customers: customerResolver } },
       { path: 'add-customer', component: AddCustomerComponent, canActivate: [authGuard] },
+      { path: 'edit-customer/:id', component: AddCustomerComponent, canActivate: [authGuard] },
       { path: 'customer/:id', component: CustomerDetailsComponent, canActivate: [authGuard] },
       { path: '**', redirectTo: '/login' }
     ])

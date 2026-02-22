@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div class="stat-card warning">
+    <div *ngIf="isAdmin" class="stat-card warning">
       <div class="stat-icon">💰</div>
       <div class="stat-info">
         <div class="stat-value">{{ formatCurrency(statistics.totalRevenue) }}</div>
@@ -44,26 +44,30 @@
       <span class="btn-icon">📋</span>
       View All Customers
     </button>
+    <button *ngIf="isAdmin" class="action-btn primary" (click)="navigateToManageStaff()" style="background: #805ad5;">
+      <span class="btn-icon">⚙️</span>
+      Manage Staff
+    </button>
   </div>
 
   <div class="recent-customers-section">
     <h2>Recent Customers</h2>
     <div class="customer-list">
-      <div
-        *ngFor="let customer of statistics.recentCustomers"
-        class="customer-card"
-        (click)="viewCustomerDetails(customer.id)"
-      >
+      <div *ngFor="let customer of statistics.recentCustomers" class="customer-card"
+        (click)="viewCustomerDetails(customer.id)">
         <div class="customer-avatar">{{ customer.name.charAt(0) }}</div>
         <div class="customer-info">
-          <div class="customer-name">{{ customer.name }}</div>
+          <span class="customer-name">{{ customer.name }}</span>
+          <span class="customer-date">{{ formatDate(customer.createdAt) }}</span>
+          <span *ngIf="customer.createdBy" class="customer-added-by">Added by: {{ customer.createdBy.name }} ({{
+            customer.createdBy.role }})</span>
           <div class="customer-phone">{{ customer.phoneNumber }}</div>
           <div class="customer-meta">
             <span class="phones-count">{{ customer.phones.length }} phone(s)</span>
             <span class="purchase-date">{{ formatDate(customer.registrationDate) }}</span>
           </div>
         </div>
-        <div class="customer-amount">{{ formatCurrency(customer.totalPurchaseAmount) }}</div>
+        <div *ngIf="isAdmin" class="customer-amount">{{ formatCurrency(customer.totalPurchaseAmount) }}</div>
       </div>
 
       <div *ngIf="statistics.recentCustomers.length === 0" class="empty-state">

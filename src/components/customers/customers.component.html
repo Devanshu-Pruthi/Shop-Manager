@@ -10,27 +10,18 @@
   <div class="search-section">
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input
-        type="text"
-        [(ngModel)]="searchQuery"
-        (input)="onSearch()"
-        placeholder="Search by name, phone, email, or IMEI..."
-        class="search-input"
-      />
-      <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''; onSearch()">✕</button>
+      <input type="text" [(ngModel)]="searchQuery" (input)="onSearchChange()"
+        placeholder="Search by name, phone, email, or IMEI..." class="search-input" />
+      <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''; onSearchChange()">✕</button>
     </div>
   </div>
 
   <div class="customers-list">
     <div class="list-header">
-      <span class="count">{{ filteredCustomers.length }} customer(s)</span>
+      <span class="count">{{ pagination.total }} customer(s) found</span>
     </div>
 
-    <div
-      *ngFor="let customer of filteredCustomers"
-      class="customer-item"
-      (click)="viewCustomerDetails(customer.id)"
-    >
+    <div *ngFor="let customer of customers" class="customer-item" (click)="viewCustomerDetails(customer.id)">
       <div class="customer-avatar">{{ customer.name.charAt(0) }}</div>
       <div class="customer-details">
         <div class="customer-name">{{ customer.name }}</div>
@@ -48,7 +39,26 @@
       </div>
     </div>
 
-    <div *ngIf="filteredCustomers.length === 0" class="empty-state">
+    <!-- Pagination Controls -->
+    <div *ngIf="pagination.pages > 1" class="pagination-controls">
+      <button [disabled]="pagination.page === 1" (click)="changePage(pagination.page - 1)" class="page-btn nav">
+        <span class="icon">❮</span>
+      </button>
+
+      <div class="page-numbers">
+        <button *ngFor="let p of pageNumbers" (click)="changePage(p)" [class.active]="p === pagination.page"
+          class="page-btn num">
+          {{ p }}
+        </button>
+      </div>
+
+      <button [disabled]="pagination.page === pagination.pages" (click)="changePage(pagination.page + 1)"
+        class="page-btn nav">
+        <span class="icon">❯</span>
+      </button>
+    </div>
+
+    <div *ngIf="customers.length === 0" class="empty-state">
       <div class="empty-icon">🔍</div>
       <h3>No customers found</h3>
       <p *ngIf="searchQuery">Try adjusting your search query</p>

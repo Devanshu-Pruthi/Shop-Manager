@@ -1,143 +1,136 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Customer, Phone } from '../models/customer.model';
+import { map, tap } from 'rxjs/operators';
+import { Customer } from '../models/customer.model';
+
+export interface PaginatedCustomers {
+  customers: Customer[];
+  page: number;
+  pages: number;
+  total: number;
+  limit: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
-  private customers: Customer[] = this.getMockCustomers();
-  private customersSubject = new BehaviorSubject<Customer[]>(this.customers);
+  private apiUrl = 'http://localhost:5000/api/customers';
+  private customersSubject = new BehaviorSubject<Customer[]>([]);
+  private paginationSubject = new BehaviorSubject<any>(null);
+  private statsSubject = new BehaviorSubject<any>(null);
+
+  constructor(private http: HttpClient) { }
+
+  // Fetch paginated customers
+  public fetchCustomers(page: number = 1, limit: number = 10, keyword: string = ''): Observable<PaginatedCustomers> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    if (keyword) {
+      params = params.set('keyword', keyword);
+    }
+
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map(res => ({
+        ...res,
+        customers: res.customers.map((c: any) => ({
+          ...c,
+          id: (c.id || c._id) as string
+        }))
+      })),
+      tap(res => {
+        this.customersSubject.next(res.customers);
+        this.paginationSubject.next({
+          page: res.page,
+          pages: res.pages,
+          total: res.total,
+          limit: res.limit
+        });
+      })
+    );
+  }
+
+  // Fetch true statistics from backend
+  public fetchStatistics(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/stats`).pipe(
+      tap(stats => this.statsSubject.next(stats))
+    );
+  }
+
+  // Fetch single customer by ID
+  public fetchCustomerById(id: string): Observable<Customer> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(c => ({
+        ...c,
+        id: (c.id || c._id) as string
+      }))
+    );
+  }
 
   getCustomers(): Observable<Customer[]> {
     return this.customersSubject.asObservable();
   }
 
-  getCustomerById(id: string): Customer | undefined {
-    return this.customers.find(c => c.id === id);
+  getPagination() {
+    return this.paginationSubject.asObservable();
   }
 
-  searchCustomers(query: string): Customer[] {
-    const lowerQuery = query.toLowerCase();
-    return this.customers.filter(customer =>
-      customer.name.toLowerCase().includes(lowerQuery) ||
-      customer.phoneNumber.includes(query) ||
-      customer.email.toLowerCase().includes(lowerQuery) ||
-      customer.phones.some(phone => phone.imeiNumber.includes(query))
-    );
+  getStatsStream() {
+    return this.statsSubject.asObservable();
   }
 
-  addCustomer(customer: Customer): void {
-    this.customers.push(customer);
-    this.customersSubject.next(this.customers);
-  }
-
-  updateCustomer(customer: Customer): void {
-    const index = this.customers.findIndex(c => c.id === customer.id);
-    if (index !== -1) {
-      this.customers[index] = customer;
-      this.customersSubject.next(this.customers);
-    }
-  }
-
-  deleteCustomer(id: string): void {
-    this.customers = this.customers.filter(c => c.id !== id);
-    this.customersSubject.next(this.customers);
-  }
-
+  // Temporary sync getter for existing components
   getStatistics() {
-    return {
-      totalCustomers: this.customers.length,
-      totalPhonesSold: this.customers.reduce((sum, c) => sum + c.phones.length, 0),
-      totalRevenue: this.customers.reduce((sum, c) => sum + c.totalPurchaseAmount, 0),
-      recentCustomers: this.customers.slice(-5).reverse()
+    return this.statsSubject.value || {
+      totalCustomers: 0,
+      totalPhonesSold: 0,
+      totalRevenue: 0,
+      recentCustomers: []
     };
   }
 
-  private getMockCustomers(): Customer[] {
-    return [
-      {
-        id: '1',
-        name: 'Rajesh Kumar',
-        phoneNumber: '+91 98765 43210',
-        email: 'rajesh.kumar@email.com',
-        address: '123 MG Road',
-        city: 'Mumbai',
-        state: 'Maharashtra',
-        referredBy: 'Walk-in',
-        phones: [
-          {
-            id: 'p1',
-            brand: 'Samsung',
-            model: 'Galaxy S23',
-            imeiNumber: '352094101234567',
-            price: 74999,
-            purchaseDate: new Date('2024-01-15')
-          }
-        ],
-        totalPurchaseAmount: 74999,
-        paymentMethod: 'UPI',
-        registrationDate: new Date('2024-01-15'),
-        lastVisit: new Date('2024-01-15'),
-        notes: 'Interested in accessories'
-      },
-      {
-        id: '2',
-        name: 'Priya Sharma',
-        phoneNumber: '+91 87654 32109',
-        email: 'priya.sharma@email.com',
-        address: '45 Park Street',
-        city: 'Delhi',
-        state: 'Delhi',
-        referredBy: 'Facebook Ad',
-        phones: [
-          {
-            id: 'p2',
-            brand: 'Apple',
-            model: 'iPhone 15 Pro',
-            imeiNumber: '359204101234568',
-            price: 134900,
-            purchaseDate: new Date('2024-02-01')
-          },
-          {
-            id: 'p3',
-            brand: 'Apple',
-            model: 'iPhone 14',
-            imeiNumber: '359204101234569',
-            price: 69900,
-            purchaseDate: new Date('2024-02-01')
-          }
-        ],
-        totalPurchaseAmount: 204800,
-        paymentMethod: 'Card',
-        registrationDate: new Date('2024-02-01'),
-        lastVisit: new Date('2024-02-01'),
-        notes: 'Bought for family members'
-      },
-      {
-        id: '3',
-        name: 'Amit Patel',
-        phoneNumber: '+91 76543 21098',
-        email: 'amit.patel@email.com',
-        address: '78 Station Road',
-        city: 'Ahmedabad',
-        state: 'Gujarat',
-        referredBy: 'Friend',
-        phones: [
-          {
-            id: 'p4',
-            brand: 'OnePlus',
-            model: '11R',
-            imeiNumber: '352094101234570',
-            price: 39999,
-            purchaseDate: new Date('2024-01-20')
-          }
-        ],
-        totalPurchaseAmount: 39999,
-        paymentMethod: 'EMI',
-        registrationDate: new Date('2024-01-20'),
-        lastVisit: new Date('2024-01-20')
-      }
-    ];
+  getCustomerById(id: string): Customer | undefined {
+    return this.customersSubject.value.find(c => c.id === id);
+  }
+
+  addCustomer(customer: Customer): Observable<Customer> {
+    return this.http.post<any>(this.apiUrl, customer).pipe(
+      map(newCustomer => ({
+        ...newCustomer,
+        id: (newCustomer.id || newCustomer._id) as string
+      })),
+      tap(() => this.refreshData())
+    );
+  }
+
+  updateCustomer(customer: Customer): Observable<Customer> {
+    return this.http.put<any>(`${this.apiUrl}/${customer.id}`, customer).pipe(
+      map(updated => ({
+        ...updated,
+        id: (updated.id || updated._id) as string
+      })),
+      tap(() => this.refreshData())
+    );
+  }
+
+  deleteCustomer(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.refreshData())
+    );
+  }
+
+  private refreshData(): void {
+    this.refreshCustomers();
+    this.fetchStatistics().subscribe();
+  }
+
+  public refreshCustomers(): void {
+    const current = this.paginationSubject.value;
+    const page = current ? current.page : 1;
+    const limit = current ? current.limit : 10;
+    this.fetchCustomers(page, limit).subscribe();
   }
 }
