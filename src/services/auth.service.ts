@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,27 +10,53 @@ export class AuthService {
     localStorage.getItem('isAuthenticated') === 'true'
   );
 
+  private userRoleSubject = new BehaviorSubject<string>(
+    localStorage.getItem('role') || 'staff'
+  );
+
+  constructor(private http: HttpClient) { }
+
   isAuthenticated(): Observable<boolean> {
     return this.isAuthenticatedSubject.asObservable();
   }
 
-  login(username: string, password: string): boolean {
-    if (username && password) {
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('username', username);
-      this.isAuthenticatedSubject.next(true);
-      return true;
-    }
-    return false;
+  getUserRole(): Observable<string> {
+    return this.userRoleSubject.asObservable();
+  }
+
+  isAdmin(): boolean {
+    return localStorage.getItem('role') === 'admin';
+  }
+
+  login(username: string, password: string): Observable<any> {
+    return this.http.post('http://localhost:5000/api/users/login', { email: username, password }).pipe(
+      tap((res: any) => {
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('username', res.name);
+        localStorage.setItem('role', res.role || 'staff');
+        localStorage.setItem('userId', res._id);
+
+        this.isAuthenticatedSubject.next(true);
+        this.userRoleSubject.next(res.role || 'staff');
+      })
+    );
   }
 
   logout(): void {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    localStorage.removeItem('userId');
+
     this.isAuthenticatedSubject.next(false);
+    this.userRoleSubject.next('staff');
   }
 
   getUsername(): string {
     return localStorage.getItem('username') || '';
+  }
+
+  getUserId(): string {
+    return localStorage.getItem('userId') || '';
   }
 }

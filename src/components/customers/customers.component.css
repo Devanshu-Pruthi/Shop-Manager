@@ -242,12 +242,13 @@
 @media (max-width: 768px) {
   .customer-item {
     padding: 12px;
+    gap: 12px;
   }
 
   .customer-avatar {
-    width: 48px;
-    height: 48px;
-    font-size: 20px;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
   }
 
   .customer-name {
@@ -257,5 +258,69 @@
   .customer-info-row {
     flex-direction: column;
     gap: 4px;
+    font-size: 12px;
   }
+
+  .amount {
+    font-size: 14px;
+  }
+}
+
+/* Pagination Premium Styles */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+  padding: 20px 0;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 8px;
+}
+
+.page-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #4a5568;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+}
+
+.page-btn:hover:not([disabled]) {
+  border-color: #4299e1;
+  color: #4299e1;
+  background: #ebf8ff;
+  transform: translateY(-2px);
+}
+
+.page-btn.active {
+  background: #4299e1;
+  color: white;
+  border-color: #4299e1;
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+.page-btn.nav {
+  background: #f8fafc;
+}
+
+.page-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
+.page-btn .icon {
+  font-size: 12px;
 }

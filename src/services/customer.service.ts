@@ -1,88 +1,136 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Customer, Phone } from '../models/customer.model';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { Customer } from '../models/customer.model';
+
+export interface PaginatedCustomers {
+  customers: Customer[];
+  page: number;
+  pages: number;
+  total: number;
+  limit: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
-  private apiUrl = 'http://localhost:3000/api/customers';
-  private customers: Customer[] = [];
+  private apiUrl = 'http://localhost:5000/api/customers';
   private customersSubject = new BehaviorSubject<Customer[]>([]);
+  private paginationSubject = new BehaviorSubject<any>(null);
+  private statsSubject = new BehaviorSubject<any>(null);
 
-  constructor(private http: HttpClient) {
-    this.refreshCustomers();
+  constructor(private http: HttpClient) { }
+
+  // Fetch paginated customers
+  public fetchCustomers(page: number = 1, limit: number = 10, keyword: string = ''): Observable<PaginatedCustomers> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    if (keyword) {
+      params = params.set('keyword', keyword);
+    }
+
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map(res => ({
+        ...res,
+        customers: res.customers.map((c: any) => ({
+          ...c,
+          id: (c.id || c._id) as string
+        }))
+      })),
+      tap(res => {
+        this.customersSubject.next(res.customers);
+        this.paginationSubject.next({
+          page: res.page,
+          pages: res.pages,
+          total: res.total,
+          limit: res.limit
+        });
+      })
+    );
   }
 
-  private refreshCustomers(): void {
-    this.http.get<Customer[]>(this.apiUrl).subscribe({
-      next: (data) => {
-        this.customers = data;
-        this.customersSubject.next(this.customers);
-      },
-      error: (err) => console.error('Error fetching customers:', err)
-    });
+  // Fetch true statistics from backend
+  public fetchStatistics(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/stats`).pipe(
+      tap(stats => this.statsSubject.next(stats))
+    );
+  }
+
+  // Fetch single customer by ID
+  public fetchCustomerById(id: string): Observable<Customer> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(c => ({
+        ...c,
+        id: (c.id || c._id) as string
+      }))
+    );
   }
 
   getCustomers(): Observable<Customer[]> {
     return this.customersSubject.asObservable();
   }
 
-  getCustomerById(id: string): Customer | undefined {
-    return this.customers.find(c => c.id === id);
+  getPagination() {
+    return this.paginationSubject.asObservable();
   }
 
+  getStatsStream() {
+    return this.statsSubject.asObservable();
+  }
+
+  // Temporary sync getter for existing components
   getStatistics() {
-    return {
-      totalCustomers: this.customers.length,
-      totalPhonesSold: this.customers.reduce((sum, c) => sum + c.phones.length, 0),
-      totalRevenue: this.customers.reduce((sum, c) => sum + c.totalPurchaseAmount, 0),
-      recentCustomers: this.customers.slice(-5).reverse()
+    return this.statsSubject.value || {
+      totalCustomers: 0,
+      totalPhonesSold: 0,
+      totalRevenue: 0,
+      recentCustomers: []
     };
   }
 
-  searchCustomers(query: string): Customer[] {
-    const lowerQuery = query.toLowerCase();
-    return this.customers.filter(customer =>
-      customer.name.toLowerCase().includes(lowerQuery) ||
-      customer.phoneNumber.includes(query) ||
-      (customer.email && customer.email.toLowerCase().includes(lowerQuery)) ||
-      customer.phones.some(phone => phone.imeiNumber.includes(query))
+  getCustomerById(id: string): Customer | undefined {
+    return this.customersSubject.value.find(c => c.id === id);
+  }
+
+  addCustomer(customer: Customer): Observable<Customer> {
+    return this.http.post<any>(this.apiUrl, customer).pipe(
+      map(newCustomer => ({
+        ...newCustomer,
+        id: (newCustomer.id || newCustomer._id) as string
+      })),
+      tap(() => this.refreshData())
     );
   }
 
-  addCustomer(customer: Customer): void {
-    this.http.post<Customer>(this.apiUrl, customer).subscribe({
-      next: (newCustomer) => {
-        this.customers.push(newCustomer);
-        this.customersSubject.next(this.customers);
-      },
-      error: (err) => console.error('Error adding customer:', err)
-    });
+  updateCustomer(customer: Customer): Observable<Customer> {
+    return this.http.put<any>(`${this.apiUrl}/${customer.id}`, customer).pipe(
+      map(updated => ({
+        ...updated,
+        id: (updated.id || updated._id) as string
+      })),
+      tap(() => this.refreshData())
+    );
   }
 
-  updateCustomer(customer: Customer): void {
-    this.http.put<Customer>(`${this.apiUrl}/${customer.id}`, customer).subscribe({
-      next: (updatedCustomer) => {
-        const index = this.customers.findIndex(c => c.id === updatedCustomer.id);
-        if (index !== -1) {
-          this.customers[index] = updatedCustomer;
-          this.customersSubject.next(this.customers);
-        }
-      },
-      error: (err) => console.error('Error updating customer:', err)
-    });
+  deleteCustomer(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.refreshData())
+    );
   }
 
-  deleteCustomer(id: string): void {
-    this.http.delete(`${this.apiUrl}/${id}`).subscribe({
-      next: () => {
-        this.customers = this.customers.filter(c => c.id !== id);
-        this.customersSubject.next(this.customers);
-      },
-      error: (err) => console.error('Error deleting customer:', err)
-    });
+  private refreshData(): void {
+    this.refreshCustomers();
+    this.fetchStatistics().subscribe();
+  }
+
+  public refreshCustomers(): void {
+    const current = this.paginationSubject.value;
+    const page = current ? current.page : 1;
+    const limit = current ? current.limit : 10;
+    this.fetchCustomers(page, limit).subscribe();
   }
 }
-

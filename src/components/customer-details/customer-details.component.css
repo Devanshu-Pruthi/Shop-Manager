@@ -11,7 +11,8 @@
 .header-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .back-btn {
@@ -28,6 +29,56 @@
   background-color: #f5f5f5;
 }
 
+.spacer {
+  flex: 1;
+}
+
+.delete-btn {
+  background-color: #f56565;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.edit-btn {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  min-width: 80px;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background-color: #e53e3e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+.edit-btn:hover {
+  background-color: #3182ce;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
 .customer-header-card {
   background: white;
   padding: 24px;
@@ -37,6 +88,26 @@
   align-items: center;
   gap: 24px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .header-content h1 {
+    font-size: 18px;
+    width: 100%;
+    order: -1;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  .customer-header-card {
+    padding: 16px;
+    gap: 16px;
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 .customer-avatar-large {
@@ -61,6 +132,14 @@
   display: flex;
   gap: 16px;
   color: #666;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .contact-info {
+    justify-content: center;
+    gap: 8px;
+  }
 }
 
 .info-item {
@@ -114,6 +193,16 @@
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .summary-cards {
+    gap: 12px;
+  }
+
+  .summary-card {
+    min-width: 100%;
+  }
 }
 
 .summary-card {
@@ -188,13 +277,22 @@
   font-size: 14px;
   color: #666;
   background: #f9f9f9;
-  padding: 8px;
+  padding: 12px;
   border-radius: 4px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .phone-meta {
+    gap: 8px;
+    flex-direction: column;
+  }
 }
 
 .meta-row {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .meta-label {

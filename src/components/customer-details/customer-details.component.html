@@ -4,6 +4,8 @@
       <button class="back-btn" (click)="goBack()">← Back</button>
       <h1>Customer Details</h1>
       <div class="spacer"></div>
+      <button class="edit-btn" (click)="navigateToEdit()">✏️ Edit</button>
+      <button *ngIf="isAdmin" class="delete-btn" (click)="deleteCustomer()">🗑️ Delete</button>
     </div>
   </div>
 
@@ -51,6 +53,11 @@
         <div class="info-row" *ngIf="customer.adharNumber">
           <span class="label">Adhar Number:</span>
           <span class="value">{{ customer.adharNumber }}</span>
+        </div>
+        <div class="info-row" *ngIf="customer.createdBy">
+          <span class="label">Added By:</span>
+          <span class="value" style="color: #3182ce; font-weight: 700;">{{ customer.createdBy.name }} ({{
+            customer.createdBy.role }})</span>
         </div>
       </div>
     </div>

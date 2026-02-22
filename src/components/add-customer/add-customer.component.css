@@ -48,6 +48,14 @@
   margin-bottom: 20px;
 }
 
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+}
+
 .form-group {
   flex: 1;
   display: flex;

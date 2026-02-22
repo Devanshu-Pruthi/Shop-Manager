@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CustomerService } from '../../services/customer.service';
+import { ToastService } from '../../services/toast.service';
 import { Customer, Phone } from '../../models/customer.model';
 
 @Component({
@@ -12,7 +13,10 @@ import { Customer, Phone } from '../../models/customer.model';
   templateUrl: './add-customer.component.html',
   styleUrls: ['./add-customer.component.css']
 })
-export class AddCustomerComponent {
+export class AddCustomerComponent implements OnInit {
+  isEditMode = false;
+  customerId: string | null = null;
+
   customer = {
     name: '',
     phoneNumber: '',
@@ -22,7 +26,6 @@ export class AddCustomerComponent {
     state: '',
     referredBy: '',
     paymentMethod: 'Cash' as 'Cash' | 'Card' | 'UPI' | 'EMI',
-
     notes: '',
     adharNumber: '',
     adharPhotoFront: '',
@@ -30,10 +33,12 @@ export class AddCustomerComponent {
   };
 
   phones: Array<{
+    id?: string;
     brand: string;
     model: string;
     imeiNumber: string;
     price: number;
+    purchaseDate?: Date;
   }> = [{
     brand: '',
     model: '',
@@ -41,14 +46,70 @@ export class AddCustomerComponent {
     price: 0
   }];
 
-
-
   errorMessage = '';
   selectedFrontFileName = '';
   selectedBackFileName = '';
   showCamera = false;
   currentSide: 'front' | 'back' = 'front';
   videoStream: MediaStream | null = null;
+
+  constructor(
+    private customerService: CustomerService,
+    private toastService: ToastService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
+
+  ngOnInit(): void {
+    this.customerId = this.route.snapshot.paramMap.get('id');
+    if (this.customerId) {
+      this.isEditMode = true;
+      const existingInCache = this.customerService.getCustomerById(this.customerId);
+      if (existingInCache) {
+        this.populateForm(existingInCache);
+      } else {
+        this.customerService.fetchCustomerById(this.customerId).subscribe({
+          next: (found) => {
+            this.populateForm(found);
+          },
+          error: () => {
+            this.router.navigate(['/customers']);
+          }
+        });
+      }
+    }
+  }
+
+  populateForm(customer: Customer): void {
+    this.customer = {
+      name: customer.name,
+      phoneNumber: customer.phoneNumber,
+      email: customer.email || '',
+      address: customer.address || '',
+      city: customer.city || '',
+      state: customer.state || '',
+      referredBy: customer.referredBy || '',
+      paymentMethod: customer.paymentMethod,
+      notes: customer.notes || '',
+      adharNumber: customer.adharNumber || '',
+      adharPhotoFront: customer.adharPhotoFront || '',
+      adharPhotoBack: customer.adharPhotoBack || ''
+    };
+
+    if (customer.phones && customer.phones.length > 0) {
+      this.phones = customer.phones.map(p => ({
+        id: p.id,
+        brand: p.brand,
+        model: p.model,
+        imeiNumber: p.imeiNumber,
+        price: p.price,
+        purchaseDate: p.purchaseDate
+      }));
+    }
+
+    if (this.customer.adharPhotoFront) this.selectedFrontFileName = 'Existing Photo';
+    if (this.customer.adharPhotoBack) this.selectedBackFileName = 'Existing Photo';
+  }
 
   onFileSelected(event: any, side: 'front' | 'back'): void {
     const file = event.target.files[0];
@@ -71,18 +132,12 @@ export class AddCustomerComponent {
     }
   }
 
-  constructor(
-    private customerService: CustomerService,
-    private router: Router
-  ) { }
-
   startCamera(side: 'front' | 'back'): void {
     this.currentSide = side;
     this.showCamera = true;
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         this.videoStream = stream;
-        // Use a timeout to ensure the video element exists after the View updates
         setTimeout(() => {
           const videoElement = document.querySelector('video');
           if (videoElement) {
@@ -152,16 +207,16 @@ export class AddCustomerComponent {
     const totalAmount = this.phones.reduce((sum, phone) => sum + Number(phone.price), 0);
 
     const phonesData: Phone[] = this.phones.map((phone, index) => ({
-      id: `${Date.now()}-${index}`,
+      id: phone.id || `P-${Date.now()}-${index}`,
       brand: phone.brand,
       model: phone.model,
       imeiNumber: phone.imeiNumber,
       price: Number(phone.price),
-      purchaseDate: new Date()
+      purchaseDate: phone.purchaseDate || new Date()
     }));
 
-    const newCustomer: Customer = {
-      id: Date.now().toString(),
+    const customerData: Customer = {
+      id: this.customerId || Date.now().toString(),
       name: this.customer.name,
       phoneNumber: this.customer.phoneNumber,
       email: this.customer.email,
@@ -172,7 +227,7 @@ export class AddCustomerComponent {
       phones: phonesData,
       totalPurchaseAmount: totalAmount,
       paymentMethod: this.customer.paymentMethod,
-      registrationDate: new Date(),
+      registrationDate: this.isEditMode ? new Date() : new Date(), // Should ideally persist original
       lastVisit: new Date(),
       notes: this.customer.notes,
       adharNumber: this.customer.adharNumber,
@@ -180,8 +235,29 @@ export class AddCustomerComponent {
       adharPhotoBack: this.customer.adharPhotoBack
     };
 
-    this.customerService.addCustomer(newCustomer);
-    this.router.navigate(['/customers']);
+    if (this.isEditMode) {
+      this.customerService.updateCustomer(customerData).subscribe({
+        next: () => {
+          this.toastService.success('Customer updated successfully');
+          this.router.navigate(['/customer', this.customerId]);
+        },
+        error: (err) => {
+          console.error('Error updating customer:', err);
+          this.toastService.error('Failed to update customer');
+        }
+      });
+    } else {
+      this.customerService.addCustomer(customerData).subscribe({
+        next: () => {
+          this.toastService.success('Customer added successfully');
+          this.router.navigate(['/customers']);
+        },
+        error: (err) => {
+          console.error('Error adding customer:', err);
+          this.toastService.error('Failed to add customer');
+        }
+      });
+    }
   }
 
   validateForm(): boolean {
@@ -190,8 +266,12 @@ export class AddCustomerComponent {
       return false;
     }
 
+    const phoneRegex = /^[6-9]\d{9}$/;
     if (!this.customer.phoneNumber.trim()) {
       this.errorMessage = 'Please enter phone number';
+      return false;
+    } else if (!phoneRegex.test(this.customer.phoneNumber.trim())) {
+      this.errorMessage = 'Please enter a valid 10-digit phone number starting with 6-9';
       return false;
     }
 
@@ -218,6 +298,10 @@ export class AddCustomerComponent {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard']);
+    if (this.isEditMode) {
+      this.router.navigate(['/customer', this.customerId]);
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
   }
 }
