@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post('http://localhost:5000/api/users/login', { email: username, password }).pipe(
+    return this.http.post('https://shop-manager-backend-txxy.onrender.com/api/users/login', { email: username, password }).pipe(
       tap((res: any) => {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('username', res.name);

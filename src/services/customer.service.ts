@@ -16,7 +16,7 @@ export interface PaginatedCustomers {
   providedIn: 'root'
 })
 export class CustomerService {
-  private apiUrl = 'http://localhost:5000/api/customers';
+  private apiUrl = 'https://shop-manager-backend-txxy.onrender.com/api/customers';
   private customersSubject = new BehaviorSubject<Customer[]>([]);
   private paginationSubject = new BehaviorSubject<any>(null);
   private statsSubject = new BehaviorSubject<any>(null);

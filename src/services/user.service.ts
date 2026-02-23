@@ -14,7 +14,7 @@ export interface User {
     providedIn: 'root'
 })
 export class UserService {
-    private apiUrl = 'http://localhost:5000/api/users';
+    private apiUrl = 'https://shop-manager-backend-txxy.onrender.com/api/users';
     private usersSubject = new BehaviorSubject<User[]>([]);
 
     constructor(private http: HttpClient) { }
