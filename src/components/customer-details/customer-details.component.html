@@ -86,6 +86,29 @@
     </div>
   </div>
 
+  <!-- Exchange Phones -->
+  <div class="info-section" *ngIf="customer.exchangePhones && customer.exchangePhones.length > 0">
+    <h3>📱 Exchange Phones (Old Phones Given)</h3>
+    <div class="phones-list">
+      <div *ngFor="let ep of customer.exchangePhones; let i = index" class="phone-card"
+        style="border-left: 3px solid #ff9800; background: #fff8e1;">
+        <div class="phone-number">Old Phone {{ i + 1 }}</div>
+        <div class="phone-details">
+          <div class="phone-main">
+            <div class="phone-brand-model">{{ ep.brand }} {{ ep.model }}</div>
+            <div class="phone-price" style="color: #e65100;">₹{{ ep.estimatedValue }}</div>
+          </div>
+          <div class="phone-meta" *ngIf="ep.imeiNumber">
+            <div class="meta-row">
+              <span class="meta-label">IMEI:</span>
+              <span class="meta-value imei">{{ ep.imeiNumber }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="info-section">
     <h3>Purchase Summary</h3>
     <div class="summary-cards">
@@ -113,6 +136,11 @@
           <div class="phone-main">
             <div class="phone-brand-model">
               {{ phone.brand }} {{ phone.model }}
+              <span style="font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-left: 8px;"
+                [style.background]="phone.condition === 'Old' ? '#fff3e0' : '#e8f5e9'"
+                [style.color]="phone.condition === 'Old' ? '#e65100' : '#2e7d32'">
+                {{ phone.condition || 'New' }}
+              </span>
             </div>
             <div class="phone-price">{{ formatCurrency(phone.price) }}</div>
           </div>

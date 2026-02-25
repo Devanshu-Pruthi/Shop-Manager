@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,7 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post('https://shop-manager-backend-txxy.onrender.com/api/users/login', { email: username, password }).pipe(
+    return this.http.post(`${environment.apiUrl}/users/login`, { email: username, password }).pipe(
       tap((res: any) => {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('username', res.name);

@@ -12,16 +12,15 @@
       <h2>Customer Information</h2>
 
       <div class="form-group">
-        <label for="name">Full Name *</label>
-        <input type="text" id="name" [(ngModel)]="customer.name" name="name" placeholder="Enter customer name"
-          required />
+        <label for="name">Full Name</label>
+        <input type="text" id="name" [(ngModel)]="customer.name" name="name" placeholder="Enter customer name" />
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="phoneNumber">Phone Number *</label>
+          <label for="phoneNumber">Phone Number</label>
           <input type="tel" id="phoneNumber" [(ngModel)]="customer.phoneNumber" name="phoneNumber"
-            placeholder="+91 XXXXX XXXXX" required />
+            placeholder="+91 XXXXX XXXXX" />
         </div>
 
         <div class="form-group">
@@ -32,9 +31,9 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label for="adharNumber">Adhar Number *</label>
+          <label for="adharNumber">Adhar Number</label>
           <input type="text" id="adharNumber" [(ngModel)]="customer.adharNumber" name="adharNumber"
-            placeholder="12 digit Adhar Number" required maxlength="14" />
+            placeholder="12 digit Adhar Number" maxlength="14" />
         </div>
       </div>
 
@@ -48,7 +47,7 @@
             <button type="button" class="action-btn upload-btn" (click)="frontFile.click()">
               Upload Photo
             </button>
-            <button type="button" class="action-btn camera-btn" (click)="startCamera('front')">
+            <button type="button" class="action-btn camera-btn" (click)="takePicture('front')">
               Capture
             </button>
           </div>
@@ -56,6 +55,7 @@
             {{ selectedFrontFileName }}
           </div>
           <div *ngIf="customer.adharPhotoFront" class="preview-container">
+            <button type="button" class="clear-photo-btn" (click)="clearPhoto('front')" title="Remove photo">✕</button>
             <img [src]="customer.adharPhotoFront" class="preview-img" />
           </div>
         </div>
@@ -69,7 +69,7 @@
             <button type="button" class="action-btn upload-btn" (click)="backFile.click()">
               Upload Photo
             </button>
-            <button type="button" class="action-btn camera-btn" (click)="startCamera('back')">
+            <button type="button" class="action-btn camera-btn" (click)="takePicture('back')">
               Capture
             </button>
           </div>
@@ -77,20 +77,22 @@
             {{ selectedBackFileName }}
           </div>
           <div *ngIf="customer.adharPhotoBack" class="preview-container">
+            <button type="button" class="clear-photo-btn" (click)="clearPhoto('back')" title="Remove photo">✕</button>
             <img [src]="customer.adharPhotoBack" class="preview-img" />
           </div>
         </div>
       </div>
 
-      <!-- Camera Modal Overlay -->
+
+      <!-- Camera Modal Overlay (browser only) -->
       <div class="camera-overlay" *ngIf="showCamera">
         <div class="camera-modal">
-          <h3>Capture {{ currentSide === 'front' ? 'Front' : 'Back' }} Side</h3>
+          <h3>📷 Capture {{ currentSide === 'front' ? 'Front' : 'Back' }} Side</h3>
           <div class="video-container">
             <video autoplay playsinline></video>
           </div>
           <div class="camera-controls">
-            <button type="button" class="capture-btn" (click)="captureImage()">Capture</button>
+            <button type="button" class="capture-btn" (click)="captureImage()">📸 Capture</button>
             <button type="button" class="cancel-btn" (click)="stopCamera()">Cancel</button>
           </div>
         </div>
@@ -103,8 +105,8 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label for="city">City *</label>
-          <input type="text" id="city" [(ngModel)]="customer.city" name="city" placeholder="City" required />
+          <label for="city">City</label>
+          <input type="text" id="city" [(ngModel)]="customer.city" name="city" placeholder="City" />
         </div>
 
         <div class="form-group">
@@ -121,12 +123,13 @@
         </div>
 
         <div class="form-group">
-          <label for="paymentMethod">Payment Method *</label>
-          <select id="paymentMethod" [(ngModel)]="customer.paymentMethod" name="paymentMethod" required>
+          <label for="paymentMethod">Payment Method</label>
+          <select id="paymentMethod" [(ngModel)]="customer.paymentMethod" name="paymentMethod">
             <option value="Cash">Cash</option>
             <option value="Card">Card</option>
             <option value="UPI">UPI</option>
             <option value="EMI">EMI</option>
+            <option value="Replacement">Exchange</option>
           </select>
         </div>
       </div>
@@ -166,10 +169,64 @@
             placeholder="15 digit IMEI number" required />
         </div>
 
-        <div class="form-group">
-          <label [for]="'price-' + i">Price (₹) *</label>
-          <input type="number" [id]="'price-' + i" [(ngModel)]="phone.price" [name]="'price-' + i" placeholder="0"
-            min="0" required />
+        <div class="form-row">
+          <div class="form-group">
+            <label [for]="'price-' + i">Price (₹) *</label>
+            <input type="number" [id]="'price-' + i" [(ngModel)]="phone.price" [name]="'price-' + i" placeholder="0"
+              min="0" required />
+          </div>
+          <div class="form-group">
+            <label [for]="'condition-' + i">Condition *</label>
+            <select [id]="'condition-' + i" [(ngModel)]="phone.condition" [name]="'condition-' + i" required>
+              <option value="New">New Phone</option>
+              <option value="Old">Old (Second-Hand)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exchange Phone Details (only when Replacement selected) -->
+    <div class="form-section" *ngIf="customer.paymentMethod === 'Replacement'">
+      <div class="section-header">
+        <h2>📱 Old Phone Details (Exchange)</h2>
+        <button type="button" class="add-phone-btn" (click)="addExchangePhone()">+ Add Old Phone</button>
+      </div>
+
+      <div *ngIf="exchangePhones.length === 0" class="no-exchange-msg">
+        No exchange phones added. Click "+ Add Old Phone" to add old phone details.
+      </div>
+
+      <div *ngFor="let ep of exchangePhones; let j = index" class="phone-entry exchange-entry">
+        <div class="phone-header">
+          <h3>Old Phone {{ j + 1 }}</h3>
+          <button type="button" class="remove-btn" (click)="removeExchangePhone(j)">Remove</button>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label [for]="'ex-brand-' + j">Brand</label>
+            <input type="text" [id]="'ex-brand-' + j" [(ngModel)]="ep.brand" [name]="'ex-brand-' + j"
+              placeholder="Samsung, Apple, etc." />
+          </div>
+          <div class="form-group">
+            <label [for]="'ex-model-' + j">Model</label>
+            <input type="text" [id]="'ex-model-' + j" [(ngModel)]="ep.model" [name]="'ex-model-' + j"
+              placeholder="Galaxy S21, iPhone 12" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label [for]="'ex-imei-' + j">IMEI Number</label>
+            <input type="text" [id]="'ex-imei-' + j" [(ngModel)]="ep.imeiNumber" [name]="'ex-imei-' + j"
+              placeholder="15 digit IMEI number" />
+          </div>
+          <div class="form-group">
+            <label [for]="'ex-value-' + j">Estimated Value (₹)</label>
+            <input type="number" [id]="'ex-value-' + j" [(ngModel)]="ep.estimatedValue" [name]="'ex-value-' + j"
+              placeholder="0" min="0" />
+          </div>
         </div>
       </div>
     </div>

@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CustomerService } from '../../services/customer.service';
 import { ToastService } from '../../services/toast.service';
 import { Customer, Phone } from '../../models/customer.model';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-add-customer',
@@ -25,7 +27,7 @@ export class AddCustomerComponent implements OnInit {
     city: '',
     state: '',
     referredBy: '',
-    paymentMethod: 'Cash' as 'Cash' | 'Card' | 'UPI' | 'EMI',
+    paymentMethod: 'Cash' as 'Cash' | 'Card' | 'UPI' | 'EMI' | 'Replacement',
     notes: '',
     adharNumber: '',
     adharPhotoFront: '',
@@ -38,17 +40,28 @@ export class AddCustomerComponent implements OnInit {
     model: string;
     imeiNumber: string;
     price: number;
+    condition: 'New' | 'Old';
     purchaseDate?: Date;
   }> = [{
     brand: '',
     model: '',
     imeiNumber: '',
-    price: 0
+    price: 0,
+    condition: 'New'
   }];
+
+  exchangePhones: Array<{
+    brand: string;
+    model: string;
+    imeiNumber: string;
+    estimatedValue: number;
+  }> = [];
 
   errorMessage = '';
   selectedFrontFileName = '';
   selectedBackFileName = '';
+
+  // Used for browser camera stream preview
   showCamera = false;
   currentSide: 'front' | 'back' = 'front';
   videoStream: MediaStream | null = null;
@@ -57,7 +70,8 @@ export class AddCustomerComponent implements OnInit {
     private customerService: CustomerService,
     private toastService: ToastService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -103,7 +117,17 @@ export class AddCustomerComponent implements OnInit {
         model: p.model,
         imeiNumber: p.imeiNumber,
         price: p.price,
+        condition: p.condition || 'New' as 'New' | 'Old',
         purchaseDate: p.purchaseDate
+      }));
+    }
+
+    if (customer.exchangePhones && customer.exchangePhones.length > 0) {
+      this.exchangePhones = customer.exchangePhones.map(ep => ({
+        brand: ep.brand,
+        model: ep.model,
+        imeiNumber: ep.imeiNumber,
+        estimatedValue: ep.estimatedValue
       }));
     }
 
@@ -127,42 +151,70 @@ export class AddCustomerComponent implements OnInit {
         } else {
           this.customer.adharPhotoBack = e.target.result;
         }
+        this.cdr.detectChanges(); // Force UI update immediately
       };
       reader.readAsDataURL(file);
     }
   }
 
-  startCamera(side: 'front' | 'back'): void {
-    this.currentSide = side;
-    this.showCamera = true;
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
+  clearPhoto(side: 'front' | 'back'): void {
+    if (side === 'front') {
+      this.customer.adharPhotoFront = '';
+      this.selectedFrontFileName = '';
+    } else {
+      this.customer.adharPhotoBack = '';
+      this.selectedBackFileName = '';
+    }
+  }
+
+  async takePicture(side: 'front' | 'back'): Promise<void> {
+    this.errorMessage = '';
+    try {
+      if (Capacitor.isNativePlatform()) {
+        // Native Android / iOS — use Capacitor Camera plugin
+        const image = await Camera.getPhoto({
+          quality: 80,
+          allowEditing: false,
+          resultType: CameraResultType.Base64,
+          source: CameraSource.Camera
+        });
+        const base64Image = `data:image/jpeg;base64,${image.base64String}`;
+        if (side === 'front') {
+          this.customer.adharPhotoFront = base64Image;
+          this.selectedFrontFileName = 'Captured from Camera';
+        } else {
+          this.customer.adharPhotoBack = base64Image;
+          this.selectedBackFileName = 'Captured from Camera';
+        }
+        this.cdr.detectChanges(); // Force UI update immediately for native capture
+      } else {
+        // Web browser — show live camera stream preview
+        this.currentSide = side;
+        this.showCamera = true;
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         this.videoStream = stream;
         setTimeout(() => {
-          const videoElement = document.querySelector('video');
-          if (videoElement) {
-            videoElement.srcObject = stream;
-          }
+          const videoElement = document.querySelector('video') as HTMLVideoElement;
+          if (videoElement) videoElement.srcObject = stream;
         }, 100);
-      })
-      .catch(err => {
-        console.error("Error accessing camera: ", err);
-        this.errorMessage = "Could not access camera. Please check permissions.";
-        this.showCamera = false;
-      });
+      }
+    } catch (err: any) {
+      console.error('Camera error:', err);
+      this.showCamera = false;
+      this.errorMessage = 'Camera access denied. Please allow camera permission in your browser settings.';
+    }
   }
 
   captureImage(): void {
-    const videoElement = document.querySelector('video');
+    const videoElement = document.querySelector('video') as HTMLVideoElement;
     const canvas = document.createElement('canvas');
     if (videoElement) {
       canvas.width = videoElement.videoWidth;
       canvas.height = videoElement.videoHeight;
-      const context = canvas.getContext('2d');
-      if (context) {
-        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-        const imageData = canvas.toDataURL('image/png');
-
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(videoElement, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
         if (this.currentSide === 'front') {
           this.customer.adharPhotoFront = imageData;
           this.selectedFrontFileName = 'Captured from Camera';
@@ -170,7 +222,6 @@ export class AddCustomerComponent implements OnInit {
           this.customer.adharPhotoBack = imageData;
           this.selectedBackFileName = 'Captured from Camera';
         }
-
         this.stopCamera();
       }
     }
@@ -178,7 +229,7 @@ export class AddCustomerComponent implements OnInit {
 
   stopCamera(): void {
     if (this.videoStream) {
-      this.videoStream.getTracks().forEach(track => track.stop());
+      this.videoStream.getTracks().forEach(t => t.stop());
       this.videoStream = null;
     }
     this.showCamera = false;
@@ -189,7 +240,8 @@ export class AddCustomerComponent implements OnInit {
       brand: '',
       model: '',
       imeiNumber: '',
-      price: 0
+      price: 0,
+      condition: 'New'
     });
   }
 
@@ -197,6 +249,19 @@ export class AddCustomerComponent implements OnInit {
     if (this.phones.length > 1) {
       this.phones.splice(index, 1);
     }
+  }
+
+  addExchangePhone(): void {
+    this.exchangePhones.push({
+      brand: '',
+      model: '',
+      imeiNumber: '',
+      estimatedValue: 0
+    });
+  }
+
+  removeExchangePhone(index: number): void {
+    this.exchangePhones.splice(index, 1);
   }
 
   onSubmit(): void {
@@ -212,6 +277,7 @@ export class AddCustomerComponent implements OnInit {
       model: phone.model,
       imeiNumber: phone.imeiNumber,
       price: Number(phone.price),
+      condition: phone.condition,
       purchaseDate: phone.purchaseDate || new Date()
     }));
 
@@ -225,6 +291,7 @@ export class AddCustomerComponent implements OnInit {
       state: this.customer.state,
       referredBy: this.customer.referredBy || 'Direct',
       phones: phonesData,
+      exchangePhones: this.customer.paymentMethod === 'Replacement' ? this.exchangePhones : [],
       totalPurchaseAmount: totalAmount,
       paymentMethod: this.customer.paymentMethod,
       registrationDate: this.isEditMode ? new Date() : new Date(), // Should ideally persist original
@@ -280,10 +347,10 @@ export class AddCustomerComponent implements OnInit {
       return false;
     }
 
-    if (!this.customer.city.trim()) {
-      this.errorMessage = 'Please enter city';
-      return false;
-    }
+    // if (!this.customer.city.trim()) {
+    //   this.errorMessage = 'Please enter city';
+    //   return false;
+    // }
 
     for (let i = 0; i < this.phones.length; i++) {
       const phone = this.phones[i];

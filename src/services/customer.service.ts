@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { Customer } from '../models/customer.model';
+import { environment } from '../environments/environment';
 
 export interface PaginatedCustomers {
   customers: Customer[];
@@ -16,7 +17,7 @@ export interface PaginatedCustomers {
   providedIn: 'root'
 })
 export class CustomerService {
-  private apiUrl = 'https://shop-manager-backend-txxy.onrender.com/api/customers';
+  private apiUrl = `${environment.apiUrl}/customers`;
   private customersSubject = new BehaviorSubject<Customer[]>([]);
   private paginationSubject = new BehaviorSubject<any>(null);
   private statsSubject = new BehaviorSubject<any>(null);

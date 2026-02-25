@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export interface User {
     _id: string;
@@ -14,7 +15,7 @@ export interface User {
     providedIn: 'root'
 })
 export class UserService {
-    private apiUrl = 'https://shop-manager-backend-txxy.onrender.com/api/users';
+    private apiUrl = `${environment.apiUrl}/users`;
     private usersSubject = new BehaviorSubject<User[]>([]);
 
     constructor(private http: HttpClient) { }

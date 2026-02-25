@@ -4,7 +4,15 @@ export interface Phone {
   model: string;
   imeiNumber: string;
   price: number;
+  condition: 'New' | 'Old';
   purchaseDate: Date;
+}
+
+export interface ExchangePhone {
+  brand: string;
+  model: string;
+  imeiNumber: string;
+  estimatedValue: number;
 }
 
 export interface Customer {
@@ -18,8 +26,9 @@ export interface Customer {
   state: string;
   referredBy?: string;
   phones: Phone[];
+  exchangePhones?: ExchangePhone[];
   totalPurchaseAmount: number;
-  paymentMethod: 'Cash' | 'Card' | 'UPI' | 'EMI';
+  paymentMethod: 'Cash' | 'Card' | 'UPI' | 'EMI' | 'Replacement';
   registrationDate: Date;
   lastVisit: Date;
   notes?: string;

@@ -21,16 +21,16 @@
     <div class="stat-card success">
       <div class="stat-icon">📱</div>
       <div class="stat-info">
-        <div class="stat-value">{{ statistics.totalPhonesSold }}</div>
-        <div class="stat-label">Phones Sold</div>
+        <div class="stat-value">{{ statistics.newPhonesSold }}</div>
+        <div class="stat-label">New Phones Sold</div>
       </div>
     </div>
 
-    <div *ngIf="isAdmin" class="stat-card warning">
-      <div class="stat-icon">💰</div>
+    <div class="stat-card success">
+      <div class="stat-icon">📦</div>
       <div class="stat-info">
-        <div class="stat-value">{{ formatCurrency(statistics.totalRevenue) }}</div>
-        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value">{{ statistics.oldPhonesSold }}</div>
+        <div class="stat-label">Old Phones Sold</div>
       </div>
     </div>
   </div>

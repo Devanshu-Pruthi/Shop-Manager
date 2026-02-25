@@ -17,6 +17,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   statistics = {
     totalCustomers: 0,
     totalPhonesSold: 0,
+    newPhonesSold: 0,
+    oldPhonesSold: 0,
     totalRevenue: 0,
     recentCustomers: [] as Customer[]
   };
