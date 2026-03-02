@@ -1,0 +1,70 @@
+<div class="dashboard-container">
+  <div class="header">
+    <div class="header-content">
+      <h1>Dashboard</h1>
+      <div class="user-section">
+        <span class="username">👤 {{ username }}</span>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card primary">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ statistics.totalCustomers }}</div>
+        <div class="stat-label">Total Customers</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon phones-icon">📱</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ statistics.totalPhonesReceived }}</div>
+        <div class="stat-label">Total Received</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <button class="action-btn primary" (click)="navigateToAddCustomer()">
+      <span class="btn-icon">➕</span>
+      Add New Customer
+    </button>
+    <button class="action-btn secondary" (click)="navigateToCustomers()">
+      <span class="btn-icon">📋</span>
+      View All Customers
+    </button>
+    <button *ngIf="isAdmin" class="action-btn primary" (click)="navigateToManageStaff()" style="background: #805ad5;">
+      <span class="btn-icon">⚙️</span>
+      Manage Staff
+    </button>
+  </div>
+
+  <div class="recent-customers-section">
+    <h2>Recent Customers</h2>
+    <div class="customer-list">
+      <button *ngFor="let customer of statistics.recentCustomers" class="customer-card"
+        (click)="viewCustomerDetails(customer.id)">
+        <div class="customer-avatar">{{ customer.name.charAt(0) }}</div>
+        <div class="customer-info">
+          <span class="customer-name">{{ customer.name }}</span>
+          <span class="customer-date">{{ formatDate(customer.createdAt) }}</span>
+          <span *ngIf="customer.createdBy" class="customer-added-by">Added by: {{ customer.createdBy.name }} ({{
+            customer.createdBy.role }})</span>
+          <div class="customer-phone">{{ customer.phoneNumber }}</div>
+          <div class="customer-meta">
+            <span class="phones-count">{{ customer.phones.length }} phone(s)</span>
+            <span class="purchase-date">{{ formatDate(customer.registrationDate) }}</span>
+          </div>
+        </div>
+
+      </button>
+
+      <div *ngIf="statistics.recentCustomers.length === 0" class="empty-state">
+        <p>No customers yet. Add your first customer to get started!</p>
+      </div>
+    </div>
+  </div>
+</div>
