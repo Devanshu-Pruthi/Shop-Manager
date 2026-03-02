@@ -7,19 +7,12 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-<<<<<<< HEAD
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-=======
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(
-    localStorage.getItem('isAuthenticated') === 'true'
-  );
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
   private userRoleSubject = new BehaviorSubject<string>(
     localStorage.getItem('role') || 'staff'
   );
 
-<<<<<<< HEAD
   constructor(private http: HttpClient) {
     this.checkSession();
   }
@@ -47,9 +40,6 @@ export class AuthService {
     const twelveHours = 12 * 60 * 60 * 1000;
     return (now - parseInt(loginTime) > twelveHours);
   }
-=======
-  constructor(private http: HttpClient) { }
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
   isAuthenticated(): Observable<boolean> {
     return this.isAuthenticatedSubject.asObservable();
@@ -70,10 +60,7 @@ export class AuthService {
         localStorage.setItem('username', res.name);
         localStorage.setItem('role', res.role || 'staff');
         localStorage.setItem('userId', res._id);
-<<<<<<< HEAD
         localStorage.setItem('loginTime', Date.now().toString());
-=======
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
         this.isAuthenticatedSubject.next(true);
         this.userRoleSubject.next(res.role || 'staff');
@@ -86,10 +73,7 @@ export class AuthService {
     localStorage.removeItem('username');
     localStorage.removeItem('role');
     localStorage.removeItem('userId');
-<<<<<<< HEAD
     localStorage.removeItem('loginTime');
-=======
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
     this.isAuthenticatedSubject.next(false);
     this.userRoleSubject.next('staff');

@@ -71,7 +71,6 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-<<<<<<< HEAD
 .password-input-wrapper {
   position: relative;
   display: flex;
@@ -102,8 +101,6 @@
   color: #4a5568;
 }
 
-=======
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 .error-message {
   background: #fed7d7;
   color: #c53030;
@@ -166,8 +163,4 @@
   .logo-icon {
     font-size: 52px;
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000

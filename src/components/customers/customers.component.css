@@ -129,13 +129,10 @@
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s;
-<<<<<<< HEAD
   border: 1px solid transparent;
   width: 100%;
   text-align: left;
   font: inherit;
-=======
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 }
 
 .customer-item:hover {

@@ -16,16 +16,12 @@ export class LoginComponent {
   username = '';
   password = '';
   errorMessage = '';
-<<<<<<< HEAD
   showPassword = false;
-=======
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
   constructor(
     private authService: AuthService,
     private toastService: ToastService,
     private router: Router
-<<<<<<< HEAD
   ) {
     // Auto-login: if already authenticated and session is valid, go to dashboard
     if (localStorage.getItem('isAuthenticated') === 'true' && !this.authService.isSessionExpired()) {
@@ -36,9 +32,6 @@ export class LoginComponent {
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
-=======
-  ) { }
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
   onSubmit(): void {
     if (!this.username || !this.password) {

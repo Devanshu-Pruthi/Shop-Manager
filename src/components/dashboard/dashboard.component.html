@@ -18,27 +18,11 @@
       </div>
     </div>
 
-<<<<<<< HEAD
     <div class="stat-card">
       <div class="stat-icon phones-icon">📱</div>
       <div class="stat-info">
         <div class="stat-value">{{ statistics.totalPhonesReceived }}</div>
         <div class="stat-label">Total Received</div>
-=======
-    <div class="stat-card success">
-      <div class="stat-icon">📱</div>
-      <div class="stat-info">
-        <div class="stat-value">{{ statistics.newPhonesSold }}</div>
-        <div class="stat-label">New Phones Sold</div>
-      </div>
-    </div>
-
-    <div class="stat-card success">
-      <div class="stat-icon">📦</div>
-      <div class="stat-info">
-        <div class="stat-value">{{ statistics.oldPhonesSold }}</div>
-        <div class="stat-label">Old Phones Sold</div>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
       </div>
     </div>
   </div>
@@ -61,11 +45,7 @@
   <div class="recent-customers-section">
     <h2>Recent Customers</h2>
     <div class="customer-list">
-<<<<<<< HEAD
       <button *ngFor="let customer of statistics.recentCustomers" class="customer-card"
-=======
-      <div *ngFor="let customer of statistics.recentCustomers" class="customer-card"
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
         (click)="viewCustomerDetails(customer.id)">
         <div class="customer-avatar">{{ customer.name.charAt(0) }}</div>
         <div class="customer-info">
@@ -79,13 +59,8 @@
             <span class="purchase-date">{{ formatDate(customer.registrationDate) }}</span>
           </div>
         </div>
-<<<<<<< HEAD
 
       </button>
-=======
-        <div *ngIf="isAdmin" class="customer-amount">{{ formatCurrency(customer.totalPurchaseAmount) }}</div>
-      </div>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
       <div *ngIf="statistics.recentCustomers.length === 0" class="empty-state">
         <p>No customers yet. Add your first customer to get started!</p>

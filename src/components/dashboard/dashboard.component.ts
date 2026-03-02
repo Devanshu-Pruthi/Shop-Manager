@@ -16,7 +16,6 @@ import { Subscription } from 'rxjs';
 export class DashboardComponent implements OnInit, OnDestroy {
   statistics = {
     totalCustomers: 0,
-<<<<<<< HEAD
     totalPhonesReceived: 0,
     conditionBreakdown: {
       Excellent: 0,
@@ -25,12 +24,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       Poor: 0
     },
     totalValuation: 0,
-=======
-    totalPhonesSold: 0,
-    newPhonesSold: 0,
-    oldPhonesSold: 0,
-    totalRevenue: 0,
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
     recentCustomers: [] as Customer[]
   };
   username = '';

@@ -121,30 +121,12 @@
           <input type="text" id="referredBy" [(ngModel)]="customer.referredBy" name="referredBy"
             placeholder="Walk-in, Friend, Ad, etc." />
         </div>
-<<<<<<< HEAD
-=======
-
-        <div class="form-group">
-          <label for="paymentMethod">Payment Method</label>
-          <select id="paymentMethod" [(ngModel)]="customer.paymentMethod" name="paymentMethod">
-            <option value="Cash">Cash</option>
-            <option value="Card">Card</option>
-            <option value="UPI">UPI</option>
-            <option value="EMI">EMI</option>
-            <option value="Replacement">Exchange</option>
-          </select>
-        </div>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
       </div>
     </div>
 
     <div class="form-section">
       <div class="section-header">
-<<<<<<< HEAD
         <h2>Received Phone Details</h2>
-=======
-        <h2>Phone Details</h2>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
         <button type="button" class="add-phone-btn" (click)="addPhone()">+ Add Phone</button>
       </div>
 
@@ -178,79 +160,23 @@
 
         <div class="form-row">
           <div class="form-group">
-<<<<<<< HEAD
             <label [for]="'price-' + i">Estimated Value (₹) *</label>
-=======
-            <label [for]="'price-' + i">Price (₹) *</label>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
             <input type="number" [id]="'price-' + i" [(ngModel)]="phone.price" [name]="'price-' + i" placeholder="0"
               min="0" required />
           </div>
           <div class="form-group">
             <label [for]="'condition-' + i">Condition *</label>
             <select [id]="'condition-' + i" [(ngModel)]="phone.condition" [name]="'condition-' + i" required>
-<<<<<<< HEAD
               <option value="Excellent">Excellent</option>
               <option value="Good">Good</option>
               <option value="Fair">Fair</option>
               <option value="Poor">Poor</option>
-=======
-              <option value="New">New Phone</option>
-              <option value="Old">Old (Second-Hand)</option>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
             </select>
           </div>
         </div>
       </div>
     </div>
 
-<<<<<<< HEAD
-=======
-    <!-- Exchange Phone Details (only when Replacement selected) -->
-    <div class="form-section" *ngIf="customer.paymentMethod === 'Replacement'">
-      <div class="section-header">
-        <h2>📱 Old Phone Details (Exchange)</h2>
-        <button type="button" class="add-phone-btn" (click)="addExchangePhone()">+ Add Old Phone</button>
-      </div>
-
-      <div *ngIf="exchangePhones.length === 0" class="no-exchange-msg">
-        No exchange phones added. Click "+ Add Old Phone" to add old phone details.
-      </div>
-
-      <div *ngFor="let ep of exchangePhones; let j = index" class="phone-entry exchange-entry">
-        <div class="phone-header">
-          <h3>Old Phone {{ j + 1 }}</h3>
-          <button type="button" class="remove-btn" (click)="removeExchangePhone(j)">Remove</button>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label [for]="'ex-brand-' + j">Brand</label>
-            <input type="text" [id]="'ex-brand-' + j" [(ngModel)]="ep.brand" [name]="'ex-brand-' + j"
-              placeholder="Samsung, Apple, etc." />
-          </div>
-          <div class="form-group">
-            <label [for]="'ex-model-' + j">Model</label>
-            <input type="text" [id]="'ex-model-' + j" [(ngModel)]="ep.model" [name]="'ex-model-' + j"
-              placeholder="Galaxy S21, iPhone 12" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label [for]="'ex-imei-' + j">IMEI Number</label>
-            <input type="text" [id]="'ex-imei-' + j" [(ngModel)]="ep.imeiNumber" [name]="'ex-imei-' + j"
-              placeholder="15 digit IMEI number" />
-          </div>
-          <div class="form-group">
-            <label [for]="'ex-value-' + j">Estimated Value (₹)</label>
-            <input type="number" [id]="'ex-value-' + j" [(ngModel)]="ep.estimatedValue" [name]="'ex-value-' + j"
-              placeholder="0" min="0" />
-          </div>
-        </div>
-      </div>
-    </div>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
     <div class="form-section">
       <div class="form-group">

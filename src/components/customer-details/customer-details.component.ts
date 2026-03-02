@@ -83,7 +83,6 @@ export class CustomerDetailsComponent implements OnInit {
       year: 'numeric'
     });
   }
-<<<<<<< HEAD
 
   formatDateTime(date: any): string {
     if (!date) return 'N/A';
@@ -96,6 +95,4 @@ export class CustomerDetailsComponent implements OnInit {
       hour12: true
     });
   }
-=======
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 }

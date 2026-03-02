@@ -86,7 +86,6 @@
     </div>
   </div>
 
-<<<<<<< HEAD
   <div class="info-section">
     <h3>Valuation Summary</h3>
     <div class="summary-cards">
@@ -101,55 +100,12 @@
       <div class="summary-card total">
         <div class="summary-label">Total Valuation</div>
         <div class="summary-value amount">{{ formatCurrency(customer.totalValuation) }}</div>
-=======
-  <!-- Exchange Phones -->
-  <div class="info-section" *ngIf="customer.exchangePhones && customer.exchangePhones.length > 0">
-    <h3>📱 Exchange Phones (Old Phones Given)</h3>
-    <div class="phones-list">
-      <div *ngFor="let ep of customer.exchangePhones; let i = index" class="phone-card"
-        style="border-left: 3px solid #ff9800; background: #fff8e1;">
-        <div class="phone-number">Old Phone {{ i + 1 }}</div>
-        <div class="phone-details">
-          <div class="phone-main">
-            <div class="phone-brand-model">{{ ep.brand }} {{ ep.model }}</div>
-            <div class="phone-price" style="color: #e65100;">₹{{ ep.estimatedValue }}</div>
-          </div>
-          <div class="phone-meta" *ngIf="ep.imeiNumber">
-            <div class="meta-row">
-              <span class="meta-label">IMEI:</span>
-              <span class="meta-value imei">{{ ep.imeiNumber }}</span>
-            </div>
-          </div>
-        </div>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
       </div>
     </div>
   </div>
 
   <div class="info-section">
-<<<<<<< HEAD
     <h3>Received Phones ({{ customer.phones.length }})</h3>
-=======
-    <h3>Purchase Summary</h3>
-    <div class="summary-cards">
-      <div class="summary-card">
-        <div class="summary-label">Total Phones</div>
-        <div class="summary-value">{{ customer.phones.length }}</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Payment Method</div>
-        <div class="summary-value payment-badge">{{ customer.paymentMethod }}</div>
-      </div>
-      <div class="summary-card total">
-        <div class="summary-label">Total Amount</div>
-        <div class="summary-value amount">{{ formatCurrency(customer.totalPurchaseAmount) }}</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="info-section">
-    <h3>Phones Purchased ({{ customer.phones.length }})</h3>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
     <div class="phones-list">
       <div *ngFor="let phone of customer.phones; let i = index" class="phone-card">
         <div class="phone-number">Phone {{ i + 1 }}</div>
@@ -158,15 +114,9 @@
             <div class="phone-brand-model">
               {{ phone.brand }} {{ phone.model }}
               <span style="font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-left: 8px;"
-<<<<<<< HEAD
                 [style.background]="phone.condition === 'Excellent' ? '#e8f5e9' : phone.condition === 'Good' ? '#e3f2fd' : phone.condition === 'Fair' ? '#fff3e0' : '#ffebee'"
                 [style.color]="phone.condition === 'Excellent' ? '#2e7d32' : phone.condition === 'Good' ? '#1976d2' : phone.condition === 'Fair' ? '#e65100' : '#c62828'">
                 {{ phone.condition }}
-=======
-                [style.background]="phone.condition === 'Old' ? '#fff3e0' : '#e8f5e9'"
-                [style.color]="phone.condition === 'Old' ? '#e65100' : '#2e7d32'">
-                {{ phone.condition || 'New' }}
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
               </span>
             </div>
             <div class="phone-price">{{ formatCurrency(phone.price) }}</div>
@@ -177,13 +127,8 @@
               <span class="meta-value imei">{{ phone.imeiNumber }}</span>
             </div>
             <div class="meta-row">
-<<<<<<< HEAD
               <span class="meta-label">Received At:</span>
               <span class="meta-value">{{ formatDateTime(phone.receivedAt || phone.purchaseDate) }}</span>
-=======
-              <span class="meta-label">Purchase Date:</span>
-              <span class="meta-value">{{ formatDate(phone.purchaseDate) }}</span>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
             </div>
           </div>
         </div>

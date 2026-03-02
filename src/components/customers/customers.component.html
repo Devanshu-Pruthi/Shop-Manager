@@ -21,11 +21,7 @@
       <span class="count">{{ pagination.total }} customer(s) found</span>
     </div>
 
-<<<<<<< HEAD
     <button *ngFor="let customer of customers" class="customer-item" (click)="viewCustomerDetails(customer.id)">
-=======
-    <div *ngFor="let customer of customers" class="customer-item" (click)="viewCustomerDetails(customer.id)">
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
       <div class="customer-avatar">{{ customer.name.charAt(0) }}</div>
       <div class="customer-details">
         <div class="customer-name">{{ customer.name }}</div>
@@ -38,17 +34,10 @@
         </div>
         <div class="customer-footer">
           <span class="payment-method">{{ customer.paymentMethod }}</span>
-<<<<<<< HEAD
           <span class="amount">{{ formatCurrency(customer.totalValuation) }}</span>
         </div>
       </div>
     </button>
-=======
-          <span class="amount">{{ formatCurrency(customer.totalPurchaseAmount) }}</span>
-        </div>
-      </div>
-    </div>
->>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
     <!-- Pagination Controls -->
     <div *ngIf="pagination.pages > 1" class="pagination-controls">
