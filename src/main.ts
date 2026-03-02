@@ -1,7 +1,11 @@
 import { Component } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+<<<<<<< HEAD
 import { provideRouter, RouterOutlet, Router } from '@angular/router';
+=======
+import { provideRouter, RouterOutlet } from '@angular/router';
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { CustomersComponent } from './components/customers/customers.component';
@@ -13,9 +17,14 @@ import { LoaderComponent } from './components/loader/loader.component';
 import { loadingInterceptor } from './interceptors/loading.interceptor';
 import { ManageStaffComponent } from './components/manage-staff/manage-staff.component';
 import { adminGuard } from './guards/admin.guard';
+<<<<<<< HEAD
 import { ToastComponent } from './components/toast/toast.component';
 import { App as CapApp } from '@capacitor/app';
 import { Location } from '@angular/common';
+=======
+
+import { ToastComponent } from './components/toast/toast.component';
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
 @Component({
   selector: 'app-root',
@@ -27,6 +36,7 @@ import { Location } from '@angular/common';
     <router-outlet></router-outlet>
   `
 })
+<<<<<<< HEAD
 export class App {
   constructor(private location: Location, private router: Router) {
     this.initializeApp();
@@ -42,6 +52,9 @@ export class App {
     });
   }
 }
+=======
+export class App { }
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
 bootstrapApplication(App, {
   providers: [

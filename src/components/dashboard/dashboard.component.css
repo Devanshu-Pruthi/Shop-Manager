@@ -5,6 +5,10 @@
 }
 
 .header {
+<<<<<<< HEAD
+=======
+  margin-top: 15px;
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
   background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
   color: white;
   padding: 20px;
@@ -39,12 +43,19 @@
   margin: 20px auto;
   padding: 0 20px;
   display: grid;
+<<<<<<< HEAD
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
 
 
+=======
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 .stat-card {
   background: white;
   border-radius: 16px;
@@ -123,6 +134,7 @@
   align-items: center;
   gap: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+<<<<<<< HEAD
   border: 1px solid transparent;
   width: 100%;
   cursor: pointer;
@@ -145,6 +157,8 @@
 .customer-card:focus-visible {
   outline: 2px solid #667eea;
   outline-offset: 2px;
+=======
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 }
 
 .customer-avatar {

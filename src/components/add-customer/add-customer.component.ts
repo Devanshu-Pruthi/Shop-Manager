@@ -40,17 +40,35 @@ export class AddCustomerComponent implements OnInit {
     model: string;
     imeiNumber: string;
     price: number;
+<<<<<<< HEAD
     condition: 'Excellent' | 'Good' | 'Fair' | 'Poor';
     purchaseDate?: Date | string;
     receivedAt?: Date | string;
+=======
+    condition: 'New' | 'Old';
+    purchaseDate?: Date;
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
   }> = [{
     brand: '',
     model: '',
     imeiNumber: '',
     price: 0,
+<<<<<<< HEAD
     condition: 'Good'
   }];
 
+=======
+    condition: 'New'
+  }];
+
+  exchangePhones: Array<{
+    brand: string;
+    model: string;
+    imeiNumber: string;
+    estimatedValue: number;
+  }> = [];
+
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
   errorMessage = '';
   selectedFrontFileName = '';
   selectedBackFileName = '';
@@ -111,9 +129,23 @@ export class AddCustomerComponent implements OnInit {
         model: p.model,
         imeiNumber: p.imeiNumber,
         price: p.price,
+<<<<<<< HEAD
         condition: p.condition || 'Good' as 'Excellent' | 'Good' | 'Fair' | 'Poor',
         purchaseDate: p.purchaseDate,
         receivedAt: p.receivedAt
+=======
+        condition: p.condition || 'New' as 'New' | 'Old',
+        purchaseDate: p.purchaseDate
+      }));
+    }
+
+    if (customer.exchangePhones && customer.exchangePhones.length > 0) {
+      this.exchangePhones = customer.exchangePhones.map(ep => ({
+        brand: ep.brand,
+        model: ep.model,
+        imeiNumber: ep.imeiNumber,
+        estimatedValue: ep.estimatedValue
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
       }));
     }
 
@@ -227,7 +259,11 @@ export class AddCustomerComponent implements OnInit {
       model: '',
       imeiNumber: '',
       price: 0,
+<<<<<<< HEAD
       condition: 'Good'
+=======
+      condition: 'New'
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
     });
   }
 
@@ -237,12 +273,32 @@ export class AddCustomerComponent implements OnInit {
     }
   }
 
+<<<<<<< HEAD
+=======
+  addExchangePhone(): void {
+    this.exchangePhones.push({
+      brand: '',
+      model: '',
+      imeiNumber: '',
+      estimatedValue: 0
+    });
+  }
+
+  removeExchangePhone(index: number): void {
+    this.exchangePhones.splice(index, 1);
+  }
+
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
   onSubmit(): void {
     if (!this.validateForm()) {
       return;
     }
 
+<<<<<<< HEAD
     const totalValuationValue = this.phones.reduce((sum, phone) => sum + Number(phone.price), 0);
+=======
+    const totalAmount = this.phones.reduce((sum, phone) => sum + Number(phone.price), 0);
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
 
     const phonesData: Phone[] = this.phones.map((phone, index) => ({
       id: phone.id || `P-${Date.now()}-${index}`,
@@ -251,8 +307,12 @@ export class AddCustomerComponent implements OnInit {
       imeiNumber: phone.imeiNumber,
       price: Number(phone.price),
       condition: phone.condition,
+<<<<<<< HEAD
       purchaseDate: phone.purchaseDate || new Date(),
       receivedAt: phone.receivedAt || new Date()
+=======
+      purchaseDate: phone.purchaseDate || new Date()
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
     }));
 
     const customerData: Customer = {
@@ -265,7 +325,12 @@ export class AddCustomerComponent implements OnInit {
       state: this.customer.state,
       referredBy: this.customer.referredBy || 'Direct',
       phones: phonesData,
+<<<<<<< HEAD
       totalValuation: totalValuationValue,
+=======
+      exchangePhones: this.customer.paymentMethod === 'Replacement' ? this.exchangePhones : [],
+      totalPurchaseAmount: totalAmount,
+>>>>>>> aae88ef2ebca9e5791e21fb65dcd26a6bc2be000
       paymentMethod: this.customer.paymentMethod,
       registrationDate: this.isEditMode ? new Date() : new Date(), // Should ideally persist original
       lastVisit: new Date(),
